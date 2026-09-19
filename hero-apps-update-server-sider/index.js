@@ -53,7 +53,12 @@ const appsCollection = database.collection("apps");
 // Apps Route
 app.get("/apps", async (req, res) => {
   try {
-    const apps = await appsCollection.find().toArray();
+    const {limit=0,skip=0}=req.query;
+    console.log(limit)
+    const apps = await appsCollection.find()
+    .limit(Number(limit))
+    .skip(Number(skip))
+    .project({ratings:0,description:0}).toArray();
     res.send(apps);
   } catch (error) {
     console.log(error);
