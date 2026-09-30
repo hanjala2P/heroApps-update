@@ -2,6 +2,8 @@
 
 A full-stack web application built with React (Vite), Tailwind CSS, Express.js, and MongoDB. It features a robust application marketplace with dynamic searching, sorting, and pagination (`limit` & `skip`) functionality.
 
+live link [https://fastidious-blini-2fe6d2.netlify.app/]
+
 ## 🚀 Tech Stack
 
 ### Frontend:
