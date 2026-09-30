@@ -1,10 +1,43 @@
 import { DiVisualstudio } from "react-icons/di";
 import AppCard from "../ui/AppCard";
 
-import { useLoaderData } from "react-router";
+import { data, useLoaderData } from "react-router";
+import { useEffect, useState } from "react";
 
 const AllAppsPage = () => {
-  const apps = useLoaderData();
+ const [apps,setApps]=useState([]);
+ const [totalApps,setTotalApps]=useState(0);
+ const [totalpage,setTotalPage]=useState(0);
+ const [currentpage,setCurrentPage]=useState(0);
+ const [sort,setSort]=useState('size')
+ const [order,setOrder]=useState('')
+ const [searchText ,setSearchText]=useState('')
+ const limit =10;
+
+
+
+ useEffect(()=>{
+  fetch(`http://localhost:5000/apps?limit=${limit}&skip=${currentpage*limit}&sort=${sort}&order=${order}&search=${searchText}`)
+  .then((res)=>res.json())
+  .then((data)=> {
+    setApps(data.apps)
+    setTotalApps(data.total)
+    const  page = Math.ceil(data.total / limit) ;
+    setTotalPage(page);
+  }
+);
+  
+ },[currentpage,order,sort,searchText]);
+ const handleSelect=(e)=>{
+  const sortText=e.target.value;
+  setSort(sortText.split('-')[0])
+  setOrder(sortText.split('-')[1])
+ }
+ const handleSearch=(e)=>{
+  setSearchText(e.target.value)
+  setCurrentPage(0)
+ }
+
   return (
     <div>
       <title>All Apps | Hero Apps</title>
@@ -22,7 +55,7 @@ const AllAppsPage = () => {
       <div className="w-11/12 mx-auto flex flex-col-reverse lg:flex-row gap-5 items-start justify-between lg:items-end mt-10">
         <div>
           <h2 className="text-lg underline font-bold">
-            ({apps.length}) Apps Found
+            ({totalApps}) Apps Found
           </h2>
         </div>
 
@@ -44,12 +77,12 @@ const AllAppsPage = () => {
                 <path d="m21 21-4.3-4.3"></path>
               </g>
             </svg>
-            <input type="search" className="" placeholder="Search Apps" />
+            <input onChange={handleSearch} type="search" className="" placeholder="Search Apps" />
           </label>
         </form>
 
         <div className="">
-          <select className="select bg-white">
+          <select onChange={handleSelect} className="select bg-white">
             <option selected disabled={true}>
               Sort by <span className="text-xs">R / S / D</span>
             </option>
@@ -78,6 +111,22 @@ const AllAppsPage = () => {
           )}
         </div>
       </>
+      <div className="flex justify-center gap-5 p-4">
+        {
+          currentpage > 0 && <button onClick={()=> setCurrentPage(currentpage -1)} className="btn btn-primary">prev</button>
+        }
+        
+        {
+          [...Array(totalpage).keys()].map((i)=> (
+            <button onClick={()=> setCurrentPage(i)} className={`btn ${i=== currentpage && 'btn-primary'}`}>{i+1}</button>
+          ))
+        }
+
+         {
+          currentpage < totalpage -1 &&  <button onClick={()=> setCurrentPage(currentpage +1)} className="btn btn-primary">Next</button>
+        }
+        
+      </div>
     </div>
   );
 };
